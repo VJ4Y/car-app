@@ -1,43 +1,63 @@
 import React, {Component} from 'react';
+import MS_SERVER_URL from '../constants.js';
+import ReactTable from 'react-table';
+import 'react-table/react-table.css';
+import Button from '@material-ui/core/Button'
 
 
-class CarList extends Component{
-    constructor (props) {
+class CarList extends Component {
+    constructor(props) {
         super(props);
-        this.state={cars:[]};
+        this.state = {
+            cars: []
+        };
     }
-    componentDidMount () {
-        fetch('http://localhost:8080/api/cars')
-        .then((response)=>response.json())
-        .then((responseData)=>this.setState(
-            {cars:responseData._embedded.cars}
-        ))
+    componentDidMount() {
+        fetch(MS_SERVER_URL + '/api/cars').then((response) => response.json()).then((responseData) => this.setState({cars: responseData._embedded.cars})).catch(err => console.error(err));
 
-        .catch(err=>console.error(err));
-
-
-
-        console.log("carrss"+this.state.cars)
+        console.log("carrss" + this.state.cars)
     }
-    
+
     render() {
 
-        let a= this.state.cars.map((car)=>car.brand);
-        console.log("carrr"+a);
+        const columns = [
+            {
+                Header: 'Brand',
+                accessor: 'brand'
+            },
+            {
+                Header: 'Color',
+                accessor: 'color'
+            },
+            {
+                Header: 'Model',
+                accessor: 'model'
+            },
+            {
+                Header: 'Price(m)',
+                accessor: 'price'
+            },
+            {
+                Header: 'RegNumber',
+                accessor: 'reg_number'
+            },
+            {
+                Header: 'Year',
+                accessor: 'year'
+            },
+            {
+                sortable:false,
+                filterable:false,
 
+                Cell:<Button color='secondary'>DELETE</Button>
+               
+            }
 
-        let tableRows=this.state.cars.map((car,i)=>
-            <tr key={i}>
-                <td>{car.brand}</td>
-            </tr>
-    
-        );
+        ]
 
         return (
             <div>
-                <table>
-                    <tbody>{tableRows}</tbody>
-                </table>
+            <ReactTable data={this.state.cars} columns={columns} filterable={true} defaultPageSize={5}/>
                 
             </div>
         );

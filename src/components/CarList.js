@@ -3,6 +3,7 @@ import MS_SERVER_URL from '../constants.js';
 import ReactTable from 'react-table';
 import 'react-table/react-table.css';
 import Button from '@material-ui/core/Button'
+import AddCar  from './AddCar.js';
 
 
 class CarList extends Component {
@@ -11,12 +12,44 @@ class CarList extends Component {
         this.state = {
             cars: []
         };
+
+        this.fetchCars=this.fetchCars.bind(this);
     }
     componentDidMount() {
-        fetch(MS_SERVER_URL + '/api/cars').then((response) => response.json()).then((responseData) => this.setState({cars: responseData._embedded.cars})).catch(err => console.error(err));
-
-        console.log("carrss" + this.state.cars)
+        this.fetchCars();
     }
+
+    fetchCars(){
+        fetch(MS_SERVER_URL + '/api/cars').then((response) => response.json())
+        .then((responseData) => {
+            console.log("fetched cars "+responseData._embedded)
+            this.setState({cars: responseData._embedded.cars});
+
+                })
+        .catch(err => console.error(err));
+    }
+    
+
+    addCar(car){
+        console.log("in addCar " + JSON.stringify(car))
+        fetch(MS_SERVER_URL + '/api/cars', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(car)
+        }).then((response) => {this.fetchCars();})
+        .catch(err => console.error(err));
+    }
+
+    deleteCar=(link)=>{
+        
+        fetch(link, {
+            method: 'DELETE'
+        }).then((response) => {this.fetchCars();})
+        .catch(err => console.error(err));
+    }
+    
 
     render() {
 
@@ -48,8 +81,8 @@ class CarList extends Component {
             {
                 sortable:false,
                 filterable:false,
-
-                Cell:<Button color='secondary'>DELETE</Button>
+                accessor: '_links.self.href',
+                Cell:({value})=><Button onClick={()=>this.deleteCar(value)} color='secondary'>DELETE</Button>
                
             }
 
@@ -57,6 +90,7 @@ class CarList extends Component {
 
         return (
             <div>
+            <AddCar addCar={this.addCar} fetchCars={this.fetchCars} />
             <ReactTable data={this.state.cars} columns={columns} filterable={true} defaultPageSize={5}/>
                 
             </div>

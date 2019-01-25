@@ -8,7 +8,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 
 function initializeReactGA() {
  ReactGA.initialize('UA-133103090-1');
- ReactGA.pageview('/homepage');
+ ReactGA.pageview('/');
 } 
 
 class App extends Component {
